@@ -120,33 +120,59 @@ async function main() {
     app.get('/dog_adoption', async (req, res) => {
         let criteria = {};
 
-        if (req.query.breed) {
-            criteria['breed'] = {
-                '$regex': req.query.breed, $options: 'i'
-            }
+        if (req.query.search) {
+            criteria['$or'] = [
+                {
+                    'dogName': {
+                        '$regex': `${req.query.search}`,
+                        '$options': 'i'
+                    }
+                },
+                {
+                    'breed': {
+                        '$regex': `${req.query.search}`,
+                        '$options': 'i'
+                    }
+                },
+                {
+                    'description': {
+                        '$regex': `${req.query.search}`,
+                        '$options': 'i'
+                    }
+                }
+            ]
         }
+
 // change to eq for gender
         if (req.query.gender) {
             criteria['gender'] = {
-                '$in': [req.query.gender]
+                '$eq': req.query.gender
             }
         };
 
         if (req.query.healthStatus) {
-            criteria['healthStatus'] = {
-                '$in': [req.query.healthStatus]
+           criteria['$and'] = req.query.healthStatus.map(hstatus => { return {"healthStatus": {'$in': [hstatus]}}})
+        };
+
+        if (req.query.hypoallergenic) {
+            criteria['hypoallergenic'] = {
+                '$eq': req.query.hypoallergenic === 'true'? true : false
             }
         };
 
+        if (req.query.toiletTrained) {
+            criteria['toiletTrained'] = {
+                '$eq': req.query.toiletTrained === 'true'? true : false
+            }
+        };
+
+        if (req.query.familyStatus) {
+            criteria['$and'] = req.query.familyStatus.map(fstatus => { return {"familyStatus": {'$in': [fstatus]}}})
+        }
+        
         if (req.query.temperament) {
             criteria['temperament'] = {
                 '$in': [req.query.temperament]
-            }
-        }
-
-        if (req.query.familyStatus) {
-            criteria['familyStatus'] = {
-                '$in': [req.query.familyStatus]
             }
         }
 
