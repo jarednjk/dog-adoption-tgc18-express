@@ -29,7 +29,7 @@ async function main() {
         let familyStatus = req.body.familyStatus
         let toiletTrained = req.body.toiletTrained;
         let pictureUrl = req.body.pictureUrl;
-        let owner = req.body.owner;
+        let owner = req.body.owner; 
 
         let errorMsg = [];
 
@@ -112,6 +112,35 @@ async function main() {
                 dogName, breed, gender, description, dateOfBirth,
                 hypoallergenic, toiletTrained, temperament,
                 healthStatus, familyStatus, pictureUrl, owner
+            })
+            res.status(200).json(result);
+        }
+    })
+
+    app.post('/dog_adoption/comments/:id', async (req, res) => {
+        let _id = new ObjectId();
+        let dateOfComment = new Date();
+        let username = req.body.username;
+        let content = req.body.content;
+
+        let errorMsg = [];
+
+        if (typeof (req.body.username) !== 'string' || !req.body.username.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+            errorMsg.push({ username: `${username} is an invalid input` })
+        }
+        if (typeof (req.body.content) !== 'string') {
+            errorMsg.push({ content: `${content} is an invalid input` });
+        }
+
+        if (errorMsg && errorMsg.length > 0) {
+            res.status(406).json({ "Errors": errorMsg });
+        } else {
+            let result = await db.collection('dog_adoption').updateOne({
+                _id: ObjectId(req.params.id)
+            }, {
+                '$push': {
+                    comments: {_id, username, dateOfComment, content}
+                }
             })
             res.status(200).json(result);
         }
