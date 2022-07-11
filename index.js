@@ -29,7 +29,8 @@ async function main() {
         let familyStatus = req.body.familyStatus
         let toiletTrained = req.body.toiletTrained;
         let pictureUrl = req.body.pictureUrl;
-        let owner = req.body.owner; 
+        let ownerName = req.body.owner.ownerName;
+        let email = req.body.owner.email
 
         let errorMsg = [];
 
@@ -98,16 +99,19 @@ async function main() {
             })
         }
 
-        if (typeof (req.body.owner) !== 'object' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ ownerName: `${owner.ownerName} is an invalid input` });
+        if (typeof (req.body.owner.ownerName) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+            errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
         }
-        if (typeof (req.body.owner) !== 'object' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-            errorMsg.push({ email: `${owner.email} is an invalid input` });
+        if (typeof (req.body.owner.email) !== 'string' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+            errorMsg.push({ email: `${email} is an invalid input` });
         }
 
         if (errorMsg && errorMsg.length > 0) {
             res.status(406).json({ "Errors": errorMsg });
         } else {
+            
+            let owner = {ownerName, email}
+
             let result = await db.collection('dog_adoption').insertOne({
                 dogName, breed, gender, description, dateOfBirth,
                 hypoallergenic, toiletTrained, temperament,
@@ -265,7 +269,8 @@ async function main() {
         let familyStatus = req.body.familyStatus
         let toiletTrained = req.body.toiletTrained;
         let pictureUrl = req.body.pictureUrl;
-        let owner = req.body.owner;
+        let ownerName = req.body.owner.ownerName;
+        let email = req.body.owner.email
 
         let errorMsg = [];
 
@@ -277,11 +282,9 @@ async function main() {
         if (typeof (req.body.breed) !== 'string' || !req.body.breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ breed: `${breed} is an invalid input` })
         }
-
         if (typeof (req.body.dateOfBirth) !== 'string' || !req.body.dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
             errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input`})
         }
-
         if (req.body.gender !== 'male' && req.body.gender !== 'female') {
             errorMsg.push({ gender: `${gender} is an invalid input` });
         }
@@ -336,29 +339,27 @@ async function main() {
             })
         }
 
-        if (typeof (req.body.owner) !== 'object' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ ownerName: `${owner.ownerName} is an invalid input` });
+        if (typeof (req.body.owner.ownerMatch) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+            errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
         }
-        if (typeof (req.body.owner) !== 'object' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-            errorMsg.push({ email: `${owner.email} is an invalid input` });
+        if (typeof (req.body.owner.email) !== 'string' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+            errorMsg.push({ email: `${email} is an invalid input` });
         }
 
         if (errorMsg && errorMsg.length > 0) {
             res.status(406).json({ "Errors": errorMsg });
         } else {
+            
+            let owner = {ownerName, email}
 
-            let result = await db.collection('dog_adoption').updateOne({
-                _id: ObjectId(req.params.id)
-            }, {
-                '$set': {
-                    dogName, breed, gender, description, dateOfBirth,
-                    hypoallergenic, toiletTrained, temperament,
-                    healthStatus, familyStatus, pictureUrl, owner
-                }
+            let result = await db.collection('dog_adoption').insertOne({
+                dogName, breed, gender, description, dateOfBirth,
+                hypoallergenic, toiletTrained, temperament,
+                healthStatus, familyStatus, pictureUrl, owner
             })
             res.status(200).json(result);
         }
-    });
+    })
 
     app.delete('/dog_adoption/:id', async (req, res) => {
         try {
