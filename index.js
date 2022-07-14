@@ -89,7 +89,7 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 4) {
+        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 3) {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
             [...req.body.temperament].map(t => {
@@ -329,7 +329,7 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 4) {
+        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 3) {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
             [...req.body.temperament].map(t => {
@@ -339,7 +339,7 @@ async function main() {
             })
         }
 
-        if (typeof (req.body.owner.ownerMatch) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        if (typeof (req.body.owner.ownerName) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
         }
         if (typeof (req.body.owner.email) !== 'string' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
