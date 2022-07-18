@@ -22,7 +22,7 @@ async function main() {
         let breed = req.body.breed;
         let gender = req.body.gender;
         let description = req.body.description;
-        let dateOfBirth = new Date (req.body.dateOfBirth);
+        let dateOfBirth = req.body.dateOfBirth;
         let hypoallergenic = req.body.hypoallergenic;
         let temperament = req.body.temperament;
         let healthStatus = req.body.healthStatus;
@@ -33,43 +33,41 @@ async function main() {
         let email = req.body.owner.email
 
         let errorMsg = [];
-
-        // how to do for date of birth
-
-        if (typeof (req.body.dogName) !== 'string' || !req.body.dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        
+        if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ dogName: `${dogName} is an invalid input` })
         }
-        if (typeof (req.body.breed) !== 'string' || !req.body.breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        if (typeof (breed) !== 'string' || !breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ breed: `${breed} is an invalid input` })
         }
-        if (typeof (req.body.dateOfBirth) !== 'string' || !req.body.dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
+        if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
             errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input`})
         }
-        if (req.body.gender !== 'male' && req.body.gender !== 'female') {
+        if (gender !== 'male' && gender !== 'female') {
             errorMsg.push({ gender: `${gender} is an invalid input` });
         }
-        if (typeof (req.body.description) !== 'string' || req.body.description.length < 50) {
+        if (typeof (description) !== 'string' || description.length < 50) {
             errorMsg.push({ description: `${description} must be at least 50 characters` });
         }
 
-        if (req.body.hypoallergenic !== true && req.body.hypoallergenic !== false) {
+        if (hypoallergenic !== true && hypoallergenic !== false) {
             errorMsg.push({ hypoallergenic: `${hypoallergenic} is an invalid input` });
         }
-        if (!req.body.pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
+        if (!pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
             errorMsg.push({ pictureUrl: `${pictureUrl} is an invalid url` });
         }
 
-        if (req.body.toiletTrained !== true && req.body.toiletTrained !== false) {
+        if (toiletTrained !== true && toiletTrained !== false) {
             errorMsg.push({ toiletTrained: `${toiletTrained} is an invalid input` });
         }
         // if it is not an array
         // if it is not s, m, v
 
-        if (!Array.isArray(req.body.healthStatus)) {
+        if (!Array.isArray(healthStatus)) {
             // send error if not array
             errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
         } else {
-            [...req.body.healthStatus].map(hstatus => {
+            [...healthStatus].map(hstatus => {
                 if (!hstatus.includes('sterilized') && !hstatus.includes('vaccinated') && !hstatus.includes('microchipped')) {
                     // send error if not any of the values
                     errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
@@ -77,11 +75,11 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.familyStatus)) {
+        if (!Array.isArray(familyStatus)) {
             // send error if not array
             errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
         } else {
-            [...req.body.familyStatus].map(fstatus => {
+            [...familyStatus].map(fstatus => {
                 if (!fstatus.includes('hdbApproved') && !fstatus.includes('goodWithKids') && !fstatus.includes('goodWithOtherDogs')) {
                     // send error if not any of the values
                     errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
@@ -89,20 +87,20 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 3) {
+        if (!Array.isArray(temperament) || temperament.length < 1 || temperament.length > 3) {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
-            [...req.body.temperament].map(t => {
+            [...temperament].map(t => {
                 if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('assertive') && !t.includes('aggressive') && !t.includes('laidback') && !t.includes('playful') && !t.includes('active')) {
                     errorMsg.push({ temperament: `${temperament} is invalid` });
                 }
             })
         }
 
-        if (typeof (req.body.owner.ownerName) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        if (typeof (ownerName) !== 'string' || !ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
         }
-        if (typeof (req.body.owner.email) !== 'string' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+        if (typeof (email) !== 'string' || !email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
             errorMsg.push({ email: `${email} is an invalid input` });
         }
 
@@ -151,7 +149,10 @@ async function main() {
     })
 
     app.get('/dog_adoption', async (req, res) => {
-        let criteria = {};
+        let criteria = {
+            // $and : []
+        };
+        
 
         if (req.query.search) {
             criteria['$or'] = [
@@ -175,42 +176,61 @@ async function main() {
                 }
             ]
         }
-
 // change to eq for gender
-        if (req.query.gender) {
-            criteria['gender'] = {
-                '$eq': req.query.gender
-            }
-        };
+        // if (req.query.gender) {
+        //     criteria['gender'] = {
+        //         '$in': [req.query.gender]
+        //     }
+        // }
 
         if (req.query.healthStatus) {
            criteria['$and'] = req.query.healthStatus.map(hstatus => { return {"healthStatus": {'$in': [hstatus]}}})
+           criteria['healthStatus'] = {
+            $all: req.query.healthStatus
+           }
         };
 
-        if (req.query.hypoallergenic) {
-            criteria['hypoallergenic'] = {
-                '$eq': req.query.hypoallergenic === 'true'? true : false
-            }
-        };
+        // if (req.query.hypoallergenic) {
+        //     criteria['hypoallergenic'] = {
+        //         '$eq': req.query.hypoallergenic === 'true'? true : false
+        //     }
+        // };
 
-        if (req.query.toiletTrained) {
-            criteria['toiletTrained'] = {
-                '$eq': req.query.toiletTrained === 'true'? true : false
-            }
-        };
+        // if (req.query.toiletTrained) {
+        //     criteria['toiletTrained'] = {
+        //         '$eq': req.query.toiletTrained === 'true'? true : false
+        //     }
+        // };
 
         if (req.query.familyStatus) {
-            criteria['$and'] = req.query.familyStatus.map(fstatus => { return {"familyStatus": {'$in': [fstatus]}}})
+            // criteria['$and'] = req.query.familyStatus.map(fstatus => { return {"familyStatus": {'$in': [fstatus]}}})
+
+            // criteria['$and'].push( {"familyStatus": {'$in': [ req.query.familyStatus[0] ]}}  )
+
+            criteria['familyStatus'] = {
+                $all: req.query.familyStatus
+            }
+
         }
         
-        if (req.query.temperament) {
-            criteria['temperament'] = {
-                '$in': [req.query.temperament]
-            }
-        }
-
+        // if (req.query.temperament) {
+        //     criteria['temperament'] = {
+        //         '$in': [req.query.temperament]
+        //     }
+        // }
+        // criteria = {
+        //     $and : [{
+        //         healthStatus : [
+        //             { '$in': [ 'microchipped' ] },
+        //             { '$in': [ 'sterilized' ] }
+        //         ]
+        //     }
+        //     ]
+        // }
+        // console.log(criteria.$and[0].healthStatus, criteria.$and[1].healthStatus)
+console.log(criteria)
         let result = await db.collection('dog_adoption').find(criteria).toArray();
-
+        // console.log(result)
         res.status(200).json(result);
     })
 
@@ -262,7 +282,7 @@ async function main() {
         let breed = req.body.breed;
         let gender = req.body.gender;
         let description = req.body.description;
-        let dateOfBirth = new Date (req.body.dateOfBirth);
+        let dateOfBirth = req.body.dateOfBirth;
         let hypoallergenic = req.body.hypoallergenic;
         let temperament = req.body.temperament;
         let healthStatus = req.body.healthStatus;
@@ -273,43 +293,41 @@ async function main() {
         let email = req.body.owner.email
 
         let errorMsg = [];
-
-        // how to do for date of birth
-
-        if (typeof (req.body.dogName) !== 'string' || !req.body.dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        
+        if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ dogName: `${dogName} is an invalid input` })
         }
-        if (typeof (req.body.breed) !== 'string' || !req.body.breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        if (typeof (breed) !== 'string' || !breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ breed: `${breed} is an invalid input` })
         }
-        if (typeof (req.body.dateOfBirth) !== 'string' || !req.body.dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
+        if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
             errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input`})
         }
-        if (req.body.gender !== 'male' && req.body.gender !== 'female') {
+        if (gender !== 'male' && gender !== 'female') {
             errorMsg.push({ gender: `${gender} is an invalid input` });
         }
-        if (typeof (req.body.description) !== 'string' || req.body.description.length < 50) {
+        if (typeof (description) !== 'string' || description.length < 50) {
             errorMsg.push({ description: `${description} must be at least 50 characters` });
         }
 
-        if (req.body.hypoallergenic !== true && req.body.hypoallergenic !== false) {
+        if (hypoallergenic !== true && hypoallergenic !== false) {
             errorMsg.push({ hypoallergenic: `${hypoallergenic} is an invalid input` });
         }
-        if (!req.body.pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
+        if (!pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
             errorMsg.push({ pictureUrl: `${pictureUrl} is an invalid url` });
         }
 
-        if (req.body.toiletTrained !== true && req.body.toiletTrained !== false) {
+        if (toiletTrained !== true && toiletTrained !== false) {
             errorMsg.push({ toiletTrained: `${toiletTrained} is an invalid input` });
         }
         // if it is not an array
         // if it is not s, m, v
 
-        if (!Array.isArray(req.body.healthStatus)) {
+        if (!Array.isArray(healthStatus)) {
             // send error if not array
             errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
         } else {
-            [...req.body.healthStatus].map(hstatus => {
+            [...healthStatus].map(hstatus => {
                 if (!hstatus.includes('sterilized') && !hstatus.includes('vaccinated') && !hstatus.includes('microchipped')) {
                     // send error if not any of the values
                     errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
@@ -317,11 +335,11 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.familyStatus)) {
+        if (!Array.isArray(familyStatus)) {
             // send error if not array
             errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
         } else {
-            [...req.body.familyStatus].map(fstatus => {
+            [...familyStatus].map(fstatus => {
                 if (!fstatus.includes('hdbApproved') && !fstatus.includes('goodWithKids') && !fstatus.includes('goodWithOtherDogs')) {
                     // send error if not any of the values
                     errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
@@ -329,20 +347,20 @@ async function main() {
             })
         }
 
-        if (!Array.isArray(req.body.temperament) || req.body.temperament.length < 1 || req.body.temperament.length > 3) {
+        if (!Array.isArray(temperament) || temperament.length < 1 || temperament.length > 3) {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
-            [...req.body.temperament].map(t => {
+            [...temperament].map(t => {
                 if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('assertive') && !t.includes('aggressive') && !t.includes('laidback') && !t.includes('playful') && !t.includes('active')) {
                     errorMsg.push({ temperament: `${temperament} is invalid` });
                 }
             })
         }
 
-        if (typeof (req.body.owner.ownerName) !== 'string' || !req.body.owner.ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
+        if (typeof (ownerName) !== 'string' || !ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
         }
-        if (typeof (req.body.owner.email) !== 'string' || !req.body.owner.email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+        if (typeof (email) !== 'string' || !email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
             errorMsg.push({ email: `${email} is an invalid input` });
         }
 
