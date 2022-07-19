@@ -177,24 +177,31 @@ async function main() {
             ]
         }
 // change to eq for gender
-        // if (req.query.gender) {
-        //     criteria['gender'] = {
-        //         '$in': [req.query.gender]
-        //     }
-        // }
+        if (req.query.gender) {
+            if (req.query.gender !== 'all') {
+                criteria['gender'] = {
+                    '$eq': req.query.gender
+                }
+            } else {
+                criteria['gender'] = {
+                    '$ne': req.query.gender
+                }
+            }
+            
+        }  
 
         if (req.query.healthStatus) {
-           criteria['$and'] = req.query.healthStatus.map(hstatus => { return {"healthStatus": {'$in': [hstatus]}}})
+        //    criteria['$and'] = req.query.healthStatus.map(hstatus => { return {"healthStatus": {'$in': [hstatus]}}})
            criteria['healthStatus'] = {
-            $all: req.query.healthStatus
+            '$all': req.query.healthStatus
            }
-        };
+        }
 
-        // if (req.query.hypoallergenic) {
-        //     criteria['hypoallergenic'] = {
-        //         '$eq': req.query.hypoallergenic === 'true'? true : false
-        //     }
-        // };
+        if (req.query.hypoallergenic) {
+            criteria['hypoallergenic'] = {
+                '$eq': req.query.hypoallergenic === 'true'? true : null
+            }
+        }
 
         // if (req.query.toiletTrained) {
         //     criteria['toiletTrained'] = {
@@ -208,7 +215,7 @@ async function main() {
             // criteria['$and'].push( {"familyStatus": {'$in': [ req.query.familyStatus[0] ]}}  )
 
             criteria['familyStatus'] = {
-                $all: req.query.familyStatus
+                '$all': req.query.familyStatus
             }
 
         }
@@ -218,16 +225,7 @@ async function main() {
         //         '$in': [req.query.temperament]
         //     }
         // }
-        // criteria = {
-        //     $and : [{
-        //         healthStatus : [
-        //             { '$in': [ 'microchipped' ] },
-        //             { '$in': [ 'sterilized' ] }
-        //         ]
-        //     }
-        //     ]
-        // }
-        // console.log(criteria.$and[0].healthStatus, criteria.$and[1].healthStatus)
+
 console.log(criteria)
         let result = await db.collection('dog_adoption').find(criteria).toArray();
         // console.log(result)
@@ -250,13 +248,13 @@ console.log(criteria)
             criteria['gender'] = {
                 '$in': [req.query.gender]
             }
-        };
+        }
 
         if (req.query.healthStatus) {
             criteria['healthStatus'] = {
                 '$in': [req.query.healthStatus]
             }
-        };
+        }
 
         if (req.query.temperament) {
             criteria['temperament'] = {
