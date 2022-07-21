@@ -33,7 +33,7 @@ async function main() {
         let email = req.body.owner.email
 
         let errorMsg = [];
-        
+
         if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ dogName: `${dogName} is an invalid input` })
         }
@@ -41,7 +41,7 @@ async function main() {
             errorMsg.push({ breed: `${breed} is an invalid input` })
         }
         if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
-            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input`})
+            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input` })
         }
         if (gender !== 'male' && gender !== 'female') {
             errorMsg.push({ gender: `${gender} is an invalid input` });
@@ -107,8 +107,8 @@ async function main() {
         if (errorMsg && errorMsg.length > 0) {
             res.status(406).json({ "Errors": errorMsg });
         } else {
-            
-            let owner = {ownerName, email}
+
+            let owner = { ownerName, email }
 
             let result = await db.collection('dog_adoption').insertOne({
                 dogName, breed, gender, description, dateOfBirth,
@@ -141,7 +141,7 @@ async function main() {
                 _id: ObjectId(req.params.id)
             }, {
                 '$push': {
-                    comments: {_id, username, dateOfComment, content}
+                    comments: { _id, username, dateOfComment, content }
                 }
             })
             res.status(200).json(result);
@@ -152,7 +152,7 @@ async function main() {
         let criteria = {
             // $and : []
         };
-        
+
 
         if (req.query.search) {
             criteria['$or'] = [
@@ -176,7 +176,6 @@ async function main() {
                 }
             ]
         }
-// change to eq for gender
         if (req.query.gender) {
             if (req.query.gender !== 'all') {
                 criteria['gender'] = {
@@ -187,21 +186,23 @@ async function main() {
                     '$ne': req.query.gender
                 }
             }
-            
-        }  
+
+        }
 
         if (req.query.healthStatus) {
-        //    criteria['$and'] = req.query.healthStatus.map(hstatus => { return {"healthStatus": {'$in': [hstatus]}}})
-           criteria['healthStatus'] = {
-            '$all': req.query.healthStatus
-           }
-        }
-
-        if (req.query.hypoallergenic) {
-            criteria['hypoallergenic'] = {
-                '$eq': req.query.hypoallergenic === 'true'? true : null
+            criteria['healthStatus'] = {
+                '$all': req.query.healthStatus
             }
         }
+
+
+        if (req.query.hypoallergenic === 'true') {
+            criteria['hypoallergenic'] = {
+                $eq: true
+            }
+        }
+
+        // req.query.hypoallergenic === 'true' ? criteria.hypoallergenic = {$eq: true} : null;
 
         // if (req.query.toiletTrained) {
         //     criteria['toiletTrained'] = {
@@ -211,24 +212,20 @@ async function main() {
 
         if (req.query.familyStatus) {
             // criteria['$and'] = req.query.familyStatus.map(fstatus => { return {"familyStatus": {'$in': [fstatus]}}})
-
-            // criteria['$and'].push( {"familyStatus": {'$in': [ req.query.familyStatus[0] ]}}  )
-
             criteria['familyStatus'] = {
                 '$all': req.query.familyStatus
             }
 
         }
-        
+
         // if (req.query.temperament) {
         //     criteria['temperament'] = {
         //         '$in': [req.query.temperament]
         //     }
         // }
 
-console.log(criteria)
+        console.log(criteria)
         let result = await db.collection('dog_adoption').find(criteria).toArray();
-        // console.log(result)
         res.status(200).json(result);
     })
 
@@ -243,7 +240,7 @@ console.log(criteria)
                 '$regex': req.query.breed, $options: 'i'
             }
         }
-// change to eq for gender
+        // change to eq for gender
         if (req.query.gender) {
             criteria['gender'] = {
                 '$in': [req.query.gender]
@@ -268,11 +265,37 @@ console.log(criteria)
             }
         }
 
-        let sortOpt = {"dateOfBirth": req.params.sortOrder === "asc" ? 1 : -1}
+        let sortOpt = { "dateOfBirth": req.params.sortOrder === "asc" ? 1 : -1 }
 
         let result = await db.collection('dog_adoption').find(criteria).sort(sortOpt).toArray();
 
         res.status(200).json(result);
+    })
+
+    app.get('/dog_adoption/:id([0-9a-fA-F]{24})', async (req, res) => {
+        let result = await db.collection('dog_adoption').findOne(
+            {
+                _id: ObjectId(req.params.id)
+            },
+            {
+                projection: {
+                    dogName: 1,
+                    breed: 1,
+                    gender: 1,
+                    description: 1,
+                    dateOfBirth: 1,
+                    hypoallergenic: 1,
+                    temperament: 1,
+                    healthStatus: 1,
+                    familyStatus: 1,
+                    toiletTrained: 1,
+                    pictureUrl: 1,
+                    owner: 1
+                }
+            }
+        );
+        res.status(200).json(result);
+
     })
 
     app.put('/dog_adoption/:id', async (req, res) => {
@@ -291,7 +314,7 @@ console.log(criteria)
         let email = req.body.owner.email
 
         let errorMsg = [];
-        
+
         if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
             errorMsg.push({ dogName: `${dogName} is an invalid input` })
         }
@@ -299,7 +322,7 @@ console.log(criteria)
             errorMsg.push({ breed: `${breed} is an invalid input` })
         }
         if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
-            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input`})
+            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input` })
         }
         if (gender !== 'male' && gender !== 'female') {
             errorMsg.push({ gender: `${gender} is an invalid input` });
@@ -365,14 +388,27 @@ console.log(criteria)
         if (errorMsg && errorMsg.length > 0) {
             res.status(406).json({ "Errors": errorMsg });
         } else {
-            
-            let owner = {ownerName, email}
 
-            let result = await db.collection('dog_adoption').insertOne({
-                dogName, breed, gender, description, dateOfBirth,
+
+
+            let owner = { ownerName, email }
+
+            console.log(dogName, breed, gender, description, dateOfBirth,
                 hypoallergenic, toiletTrained, temperament,
-                healthStatus, familyStatus, pictureUrl, owner
-            })
+                healthStatus, familyStatus, pictureUrl, owner)
+
+            let result = await db.collection('dog_adoption').updateOne(
+                {
+                    _id: ObjectId(req.params.id)
+                },
+                {
+                    '$set': {
+                        dogName, breed, gender, description, dateOfBirth,
+                        hypoallergenic, toiletTrained, temperament,
+                        healthStatus, familyStatus, pictureUrl, owner
+                    }
+                }
+            )
             res.status(200).json(result);
         }
     })
