@@ -229,11 +229,11 @@ async function main() {
 
        
 
-        // if (req.query.temperament) {
-        //     criteria['temperament'] = {
-        //         '$in': [req.query.temperament]
-        //     }
-        // }
+        if (req.query.temperament) {
+            criteria['temperament'] = {
+                '$in': req.query.temperament
+            }
+        }
 
         console.log(criteria)
         let result = await db.collection('dog_adoption').find(criteria).toArray();
@@ -243,45 +243,15 @@ async function main() {
     // /dog_adoption/dateOfBirth/asc
     // /dog_adoption/dateOfBirth/desc
 
-    app.get('/dog_adoption/dateOfBirth/:sortOrder', async (req, res) => {
-        let criteria = {};
+    // app.get('/dog_adoption/dateOfBirth/:sortOrder', async (req, res) => {
+    //     let criteria = {};
 
-        if (req.query.breed) {
-            criteria['breed'] = {
-                '$regex': req.query.breed, $options: 'i'
-            }
-        }
-        // change to eq for gender
-        if (req.query.gender) {
-            criteria['gender'] = {
-                '$in': [req.query.gender]
-            }
-        }
+    //     let sortOpt = { "dateOfBirth": req.params.sortOrder === "asc" ? 1 : -1 }
 
-        if (req.query.healthStatus) {
-            criteria['healthStatus'] = {
-                '$in': [req.query.healthStatus]
-            }
-        }
+    //     let result = await db.collection('dog_adoption').find(criteria).sort(sortOpt).toArray();
 
-        if (req.query.temperament) {
-            criteria['temperament'] = {
-                '$in': [req.query.temperament]
-            }
-        }
-
-        if (req.query.familyStatus) {
-            criteria['familyStatus'] = {
-                '$in': [req.query.familyStatus]
-            }
-        }
-
-        let sortOpt = { "dateOfBirth": req.params.sortOrder === "asc" ? 1 : -1 }
-
-        let result = await db.collection('dog_adoption').find(criteria).sort(sortOpt).toArray();
-
-        res.status(200).json(result);
-    })
+    //     res.status(200).json(result);
+    // })
 
     app.get('/dog_adoption/:id([0-9a-fA-F]{24})', async (req, res) => {
         let result = await db.collection('dog_adoption').findOne(
