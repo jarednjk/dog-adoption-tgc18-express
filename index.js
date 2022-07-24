@@ -204,12 +204,6 @@ async function main() {
 
         // req.query.hypoallergenic === 'true' ? criteria.hypoallergenic = {$eq: true} : null;
 
-        // if (req.query.toiletTrained) {
-        //     criteria['toiletTrained'] = {
-        //         '$eq': req.query.toiletTrained === 'true'? true : false
-        //     }
-        // };
-
         if (req.query.familyStatus) {
             // criteria['$and'] = req.query.familyStatus.map(fstatus => { return {"familyStatus": {'$in': [fstatus]}}})
             criteria['familyStatus'] = {
@@ -217,6 +211,23 @@ async function main() {
             }
 
         }
+
+        if (req.query.gteyear && !req.query.lteyear) {
+            criteria['dateOfBirth'] = {
+                '$gte': req.query.gteyear
+            }
+        } else if (!req.query.gteyear && req.query.lteyear) {
+            criteria['dateOfBirth'] = {
+                '$lte': req.query.lteyear
+            }
+        } else if (req.query.gteyear && req.query.lteyear) {
+            criteria['dateOfBirth'] = {
+                '$gte': req.query.gteyear,
+                '$lte': req.query.lteyear
+            }
+        }
+
+       
 
         // if (req.query.temperament) {
         //     criteria['temperament'] = {
