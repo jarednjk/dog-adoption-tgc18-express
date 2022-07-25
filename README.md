@@ -1,13 +1,23 @@
-# dog-adoption-tgc18-express
+# Adogpt API
 
-Strategy
+This is a RESTful API project built using NodeJS (ExpressJS) and MongoDB for a dog adoption website. It is used in combination with a frontend interface, React. The repository can be found [here].
 
-User of my website are people are generally dog lovers who are either current dog owners or future dog owners. Current dog owners might put their pet up for adoption for certain reasons. Future dog owners may prefer to adopt instead of buy as there is no upfront cost to buy them as well as other reasons. However, they also want important information to see if the dog is healthy and a good fit for their criterias.
+## RESTful API
 
-My users may not be able to find all the critical information such as hdb approved, hypoallergenic, and health status. I also noticed that certain pet adoption websites are too complicated, making it difficult for the users to navigate to browse the dogs available for adoption.
+## Technologies Used
+
+1. [ExpressJS](https://expressjs.com/) & [NodeJS](https://nodejs.org/en/) - minimalist web application framework to help manage servers and routes
+2. [MongoDB & MongoDB Atlas](https://www.mongodb.com/) - manage document-oriented information, store or retrieve information
+3. [Heroku](https://id.heroku.com/login) - cloud platform server for API
+
+## Sample Mongo Documents
 
 
 
+## Testing
 
-Why adoption over buying
-Did you know that over 1,000 people per hour run a search right here looking to adopt a pet? Pet adoption is quickly becoming the preferred way to find a new dog or cat, and rightly so, there are many benefits to adopting a pet. Pet adoption fees are usually much lower than buying from a breeder. You’re also likely to find a pet who’s already learned a few things. Adoptable pets are often already housetrained, good with kids, and do well with other pets. And don’t forget the wonderful feeling you get from saving a life!
+Testing is done for the HTTP methods (POST, GET, PUT, DELETE) via the [Advanced REST Client](https://install.advancedrestclient.com/install).
+
+## Deployment
+
+Deployment is done through Heroku. For the detailed deployment steps, you may refer [here](https://devcenter.heroku.com/articles/git#deploy-your-code).

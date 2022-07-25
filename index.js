@@ -91,7 +91,7 @@ async function main() {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
             [...temperament].map(t => {
-                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('assertive') && !t.includes('aggressive') && !t.includes('laidback') && !t.includes('playful') && !t.includes('active')) {
+                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('aggressive') && !t.includes('laid-back') && !t.includes('playful')) {
                     errorMsg.push({ temperament: `${temperament} is invalid` });
                 }
             })
@@ -149,9 +149,7 @@ async function main() {
     })
 
     app.get('/dog_adoption', async (req, res) => {
-        let criteria = {
-            // $and : []
-        };
+        let criteria = {};
 
 
         if (req.query.search) {
@@ -198,7 +196,7 @@ async function main() {
 
         if (req.query.hypoallergenic === 'true') {
             criteria['hypoallergenic'] = {
-                $eq: true
+                '$eq': true
             }
         }
 
@@ -235,7 +233,6 @@ async function main() {
             }
         }
 
-        console.log(criteria)
         let result = await db.collection('dog_adoption').find(criteria).toArray();
         res.status(200).json(result);
     })
@@ -353,7 +350,7 @@ async function main() {
             errorMsg.push({ temperament: `${temperament} is invalid` });
         } else {
             [...temperament].map(t => {
-                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('assertive') && !t.includes('aggressive') && !t.includes('laidback') && !t.includes('playful') && !t.includes('active')) {
+                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('aggressive') && !t.includes('laid-back') && !t.includes('playful')) {
                     errorMsg.push({ temperament: `${temperament} is invalid` });
                 }
             })
@@ -370,13 +367,7 @@ async function main() {
             res.status(406).json({ "Errors": errorMsg });
         } else {
 
-
-
             let owner = { ownerName, email }
-
-            console.log(dogName, breed, gender, description, dateOfBirth,
-                hypoallergenic, toiletTrained, temperament,
-                healthStatus, familyStatus, pictureUrl, owner)
 
             let result = await db.collection('dog_adoption').updateOne(
                 {
@@ -396,7 +387,7 @@ async function main() {
 
     app.delete('/dog_adoption/:id', async (req, res) => {
         try {
-            await db.collection('dog_adoption').remove({
+            await db.collection('dog_adoption').deleteOne({
                 _id: ObjectId(req.params.id)
             });
             res.status(200);
