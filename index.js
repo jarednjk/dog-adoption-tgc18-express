@@ -225,7 +225,7 @@ async function main() {
             }
         }
 
-       
+
 
         if (req.query.temperament) {
             criteria['temperament'] = {
