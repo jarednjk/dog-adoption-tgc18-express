@@ -5,6 +5,7 @@ const MONGO_URI = process.env.MONGO_URI;
 const cors = require('cors');
 const { ObjectId } = require('mongodb');
 const app = express();
+let Validation = require('./Validation')
 
 app.use(cors());
 app.use(express.json());
@@ -32,82 +33,19 @@ async function main() {
         let ownerName = req.body.owner.ownerName;
         let email = req.body.owner.email
 
-        let errorMsg = [];
+        let errorTracker = [];
 
-        if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ dogName: `${dogName} is an invalid input` })
-        }
-        if (typeof (breed) !== 'string' || !breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ breed: `${breed} is an invalid input` })
-        }
-        if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
-            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input` })
-        }
-        if (gender !== 'male' && gender !== 'female') {
-            errorMsg.push({ gender: `${gender} is an invalid input` });
-        }
-        if (typeof (description) !== 'string' || description.length < 50) {
-            errorMsg.push({ description: `${description} must be at least 50 characters` });
-        }
+        errorTracker.push(
+            Validation.validateDogName(dogName), Validation.validateBreed(breed), Validation.validateEmail(email), Validation.validateGender(gender),
+            Validation.validateToiletTrained(toiletTrained), Validation.validateDescription(description), Validation.validateHypoallergenic(hypoallergenic),
+            Validation.validateTemperament(temperament), Validation.validateHealthStatus(healthStatus), Validation.validateFamilyStatus(familyStatus),
+            Validation.validatePictureUrl(pictureUrl), Validation.validateOwnerName(ownerName), Validation.validateDateOfBirth(dateOfBirth)
+        )
 
-        if (hypoallergenic !== true && hypoallergenic !== false) {
-            errorMsg.push({ hypoallergenic: `${hypoallergenic} is an invalid input` });
+        if (errorTracker.includes(false)) {
+            res.status(406).json("Errors")
         }
-        if (!pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
-            errorMsg.push({ pictureUrl: `${pictureUrl} is an invalid url` });
-        }
-
-        if (toiletTrained !== true && toiletTrained !== false) {
-            errorMsg.push({ toiletTrained: `${toiletTrained} is an invalid input` });
-        }
-        // if it is not an array
-        // if it is not s, m, v
-
-        if (!Array.isArray(healthStatus)) {
-            // send error if not array
-            errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
-        } else {
-            [...healthStatus].map(hstatus => {
-                if (!hstatus.includes('sterilized') && !hstatus.includes('vaccinated') && !hstatus.includes('microchipped')) {
-                    // send error if not any of the values
-                    errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
-                }
-            })
-        }
-
-        if (!Array.isArray(familyStatus)) {
-            // send error if not array
-            errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
-        } else {
-            [...familyStatus].map(fstatus => {
-                if (!fstatus.includes('hdbApproved') && !fstatus.includes('goodWithKids') && !fstatus.includes('goodWithOtherDogs')) {
-                    // send error if not any of the values
-                    errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
-                }
-            })
-        }
-
-        if (!Array.isArray(temperament) || temperament.length < 1 || temperament.length > 3) {
-            errorMsg.push({ temperament: `${temperament} is invalid` });
-        } else {
-            [...temperament].map(t => {
-                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('aggressive') && !t.includes('laid-back') && !t.includes('playful')) {
-                    errorMsg.push({ temperament: `${temperament} is invalid` });
-                }
-            })
-        }
-
-        if (typeof (ownerName) !== 'string' || !ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
-        }
-        if (typeof (email) !== 'string' || !email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-            errorMsg.push({ email: `${email} is an invalid input` });
-        }
-
-        if (errorMsg && errorMsg.length > 0) {
-            res.status(406).json({ "Errors": errorMsg });
-        } else {
-
+        else {
             let owner = { ownerName, email }
 
             let result = await db.collection('dog_adoption').insertOne({
@@ -151,7 +89,6 @@ async function main() {
     app.get('/dog_adoption', async (req, res) => {
         let criteria = {};
 
-
         if (req.query.search) {
             criteria['$or'] = [
                 {
@@ -174,6 +111,7 @@ async function main() {
                 }
             ]
         }
+
         if (req.query.gender) {
             if (req.query.gender !== 'all') {
                 criteria['gender'] = {
@@ -184,7 +122,6 @@ async function main() {
                     '$ne': req.query.gender
                 }
             }
-
         }
 
         if (req.query.healthStatus) {
@@ -199,7 +136,6 @@ async function main() {
                 '$eq': true
             }
         }
-
         // req.query.hypoallergenic === 'true' ? criteria.hypoallergenic = {$eq: true} : null;
 
         if (req.query.familyStatus) {
@@ -207,7 +143,6 @@ async function main() {
             criteria['familyStatus'] = {
                 '$all': req.query.familyStatus
             }
-
         }
 
         if (req.query.gteyear && !req.query.lteyear) {
@@ -224,8 +159,6 @@ async function main() {
                 '$lte': req.query.lteyear
             }
         }
-
-
 
         if (req.query.temperament) {
             criteria['temperament'] = {
@@ -271,9 +204,8 @@ async function main() {
                     owner: 1
                 }
             }
-        );
+        )
         res.status(200).json(result);
-
     })
 
     app.put('/dog_adoption/:id', async (req, res) => {
@@ -291,82 +223,19 @@ async function main() {
         let ownerName = req.body.owner.ownerName;
         let email = req.body.owner.email
 
-        let errorMsg = [];
+        let errorTracker = [];
 
-        if (typeof (dogName) !== 'string' || !dogName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ dogName: `${dogName} is an invalid input` })
-        }
-        if (typeof (breed) !== 'string' || !breed.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ breed: `${breed} is an invalid input` })
-        }
-        if (typeof (dateOfBirth) !== 'string' || !dateOfBirth.match(/^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/)) {
-            errorMsg.push({ dateOfBirth: `${dateOfBirth} is an invalid input` })
-        }
-        if (gender !== 'male' && gender !== 'female') {
-            errorMsg.push({ gender: `${gender} is an invalid input` });
-        }
-        if (typeof (description) !== 'string' || description.length < 50) {
-            errorMsg.push({ description: `${description} must be at least 50 characters` });
-        }
+        errorTracker.push(
+            Validation.validateDogName(dogName), Validation.validateBreed(breed), Validation.validateEmail(email), Validation.validateGender(gender),
+            Validation.validateToiletTrained(toiletTrained), Validation.validateDescription(description), Validation.validateHypoallergenic(hypoallergenic),
+            Validation.validateTemperament(temperament), Validation.validateHealthStatus(healthStatus), Validation.validateFamilyStatus(familyStatus),
+            Validation.validatePictureUrl(pictureUrl), Validation.validateOwnerName(ownerName), Validation.validateDateOfBirth(dateOfBirth)
+        )
 
-        if (hypoallergenic !== true && hypoallergenic !== false) {
-            errorMsg.push({ hypoallergenic: `${hypoallergenic} is an invalid input` });
+        if (errorTracker.includes(false)) {
+            res.status(406).json("Errors")
         }
-        if (!pictureUrl.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/)) {
-            errorMsg.push({ pictureUrl: `${pictureUrl} is an invalid url` });
-        }
-
-        if (toiletTrained !== true && toiletTrained !== false) {
-            errorMsg.push({ toiletTrained: `${toiletTrained} is an invalid input` });
-        }
-        // if it is not an array
-        // if it is not s, m, v
-
-        if (!Array.isArray(healthStatus)) {
-            // send error if not array
-            errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
-        } else {
-            [...healthStatus].map(hstatus => {
-                if (!hstatus.includes('sterilized') && !hstatus.includes('vaccinated') && !hstatus.includes('microchipped')) {
-                    // send error if not any of the values
-                    errorMsg.push({ healthStatus: `${healthStatus} is invalid` });
-                }
-            })
-        }
-
-        if (!Array.isArray(familyStatus)) {
-            // send error if not array
-            errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
-        } else {
-            [...familyStatus].map(fstatus => {
-                if (!fstatus.includes('hdbApproved') && !fstatus.includes('goodWithKids') && !fstatus.includes('goodWithOtherDogs')) {
-                    // send error if not any of the values
-                    errorMsg.push({ familyStatus: `${familyStatus} is invalid` });
-                }
-            })
-        }
-
-        if (!Array.isArray(temperament) || temperament.length < 1 || temperament.length > 3) {
-            errorMsg.push({ temperament: `${temperament} is invalid` });
-        } else {
-            [...temperament].map(t => {
-                if (!t.includes('good-natured') && !t.includes('shy') && !t.includes('aggressive') && !t.includes('laid-back') && !t.includes('playful')) {
-                    errorMsg.push({ temperament: `${temperament} is invalid` });
-                }
-            })
-        }
-
-        if (typeof (ownerName) !== 'string' || !ownerName.match(/^[A-Za-z]+( [A-Za-z]+)*$/)) {
-            errorMsg.push({ ownerName: `${ownerName} is an invalid input` });
-        }
-        if (typeof (email) !== 'string' || !email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
-            errorMsg.push({ email: `${email} is an invalid input` });
-        }
-
-        if (errorMsg && errorMsg.length > 0) {
-            res.status(406).json({ "Errors": errorMsg });
-        } else {
-
+        else {
             let owner = { ownerName, email }
 
             let result = await db.collection('dog_adoption').updateOne(
@@ -398,9 +267,9 @@ async function main() {
         } catch (e) {
             res.status(500).send("Internal server error. Please contact administrator.");
         }
-    });
+    })
 
-};
+}
 
 main();
 
