@@ -14,7 +14,6 @@ This is a RESTful API project built using NodeJS (ExpressJS) and MongoDB for a d
 ```
 GET /dog_adoption
 ```
-
 #### Response
 Returns an array of the dog records
 
@@ -24,7 +23,6 @@ Returns an array of the dog records
 ```
 POST /dog_adoption
 ```
-
 #### Response
 New dog is added to the database
 
@@ -34,7 +32,6 @@ New dog is added to the database
 ```
 PUT /dog_adoption/:id
 ```
-
 #### Response
 Dog record (id: _id) is updated in the database
 
@@ -44,7 +41,6 @@ Dog record (id: _id) is updated in the database
 ```
 DELETE /dog_adoption/:id
 ```
-
 #### Response
 Dog record (id: _id) is deleted from the database
 
@@ -54,7 +50,6 @@ Dog record (id: _id) is deleted from the database
 ```
 POST /dog_adoption/comments/:id
 ```
-
 #### Response
 Comment is posted on the dog
 
